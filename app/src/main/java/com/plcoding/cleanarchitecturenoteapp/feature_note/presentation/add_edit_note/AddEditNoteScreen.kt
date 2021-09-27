@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -22,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.plcoding.cleanarchitecturenoteapp.feature_note.domain.model.Note
+import com.plcoding.cleanarchitecturenoteapp.feature_note.presentation.add_edit_note.components.TransparentHintTextField
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,6 +44,22 @@ fun AddEditNoteScreen(
         )
     }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = true){
+        viewModel.eventFlow.collectLatest { event ->
+            when(event){
+                is AddEditViewModel.UiEvent.ShowSnackbar ->{
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+
+                }
+                is AddEditViewModel.UiEvent.SaveNote -> {
+                    navController.navigateUp()
+                }
+            }
+        }
+    }
 
     Scaffold(
         floatingActionButton =
@@ -79,7 +98,8 @@ fun AddEditNoteScreen(
                             width = 3.dp,
                             color = if (viewModel.noteColor.value == coloInt) {
                                 Color.Black
-                            } else Color.Transparent
+                            } else Color.Transparent,
+                            shape = CircleShape
                         )
                         .clickable {
                             scope.launch {
@@ -96,6 +116,35 @@ fun AddEditNoteScreen(
                 }
 
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            TransparentHintTextField(
+                text = titleState.text,
+                hint = titleState.hint,
+                onValueChange = {
+                                viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
+                },
+                onFocusChange ={
+                    viewModel.onEvent(AddEditNoteEvent.ChangeTitleFocus(it))
+                },
+                isHintVisible = titleState.isVisible,
+                singleLine = true,
+                textStyle = MaterialTheme.typography.h5
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            TransparentHintTextField(
+                text = contentState.text,
+                hint = contentState.hint,
+                onValueChange = {
+                    viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
+                },
+                onFocusChange ={
+                    viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
+                },
+                isHintVisible = contentState.isVisible,
+                textStyle = MaterialTheme.typography.body1,
+                modifier = Modifier.fillMaxHeight()
+
+            )
 
         }
     }
