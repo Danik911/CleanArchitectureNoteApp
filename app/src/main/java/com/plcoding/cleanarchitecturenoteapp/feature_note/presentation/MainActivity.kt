@@ -16,7 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.plcoding.cleanarchitecturenoteapp.feature_note.presentation.add_edit_note.AddEditNoteScreen
-import com.plcoding.cleanarchitecturenoteapp.feature_note.presentation.notes.NoteScreen
+import com.plcoding.cleanarchitecturenoteapp.feature_note.presentation.notes.NotesScreen
 import com.plcoding.cleanarchitecturenoteapp.feature_note.presentation.util.Screens
 import com.plcoding.cleanarchitecturenoteapp.ui.theme.CleanArchitectureNoteAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = Screens.NotesScreen.route
                     ) {
                         composable(route = Screens.NotesScreen.route) {
-                            NoteScreen(navController = navController)
+                            NotesScreen(navController = navController)
                         }
                         composable(route = Screens.AddEditNoteScreen.route +
                                 "?noteId={noteId}&noteColor={noteColor}",

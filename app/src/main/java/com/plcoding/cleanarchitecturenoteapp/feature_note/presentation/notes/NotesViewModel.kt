@@ -24,10 +24,11 @@ class NotesViewModel @Inject constructor(
     val state: State<NotesState> = _state
 
     private var recentlyDeletedNote: Note? = null
-    private var getNoteJob: Job? = null
+
+    private var getNotesJob: Job? = null
 
     init {
-        getNotes(noteOrder = NoteOrder.Date(orderType = OrderType.Descending))
+        getNotes(NoteOrder.Date(OrderType.Descending))
     }
 
     fun onEvent(event: NotesEvent) {
@@ -35,10 +36,10 @@ class NotesViewModel @Inject constructor(
             is NotesEvent.Order -> {
                 if (state.value.noteOrder::class == event.noteOrder::class &&
                     state.value.noteOrder.orderType == event.noteOrder.orderType
-                ){
+                ) {
                     return
                 }
-
+                getNotes(event.noteOrder)
             }
             is NotesEvent.DeleteNote -> {
                 viewModelScope.launch {
@@ -48,22 +49,21 @@ class NotesViewModel @Inject constructor(
             }
             is NotesEvent.RestoreNote -> {
                 viewModelScope.launch {
-                    noteUseCases.addNote(note = recentlyDeletedNote ?: return@launch)
+                    noteUseCases.addNote(recentlyDeletedNote ?: return@launch)
                     recentlyDeletedNote = null
                 }
-
             }
             is NotesEvent.ToggleOrderSection -> {
                 _state.value = state.value.copy(
                     isOrderSectionVisible = !state.value.isOrderSectionVisible
                 )
-
             }
         }
     }
-    private fun getNotes(noteOrder: NoteOrder){
-        getNoteJob?.cancel()
-        getNoteJob = noteUseCases.getNotes(noteOrder = noteOrder)
+
+    private fun getNotes(noteOrder: NoteOrder) {
+        getNotesJob?.cancel()
+        getNotesJob = noteUseCases.getNotes(noteOrder)
             .onEach { notes ->
                 _state.value = state.value.copy(
                     notes = notes,
@@ -72,5 +72,4 @@ class NotesViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
     }
-
 }
