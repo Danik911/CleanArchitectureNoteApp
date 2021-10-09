@@ -46,4 +46,45 @@ class GetNotesUseCaseTest{
             assertThat(notes[i].title).isLessThan(notes[i+1].title)
         }
     }
+    @Test
+    fun `Order notes by title Descending, correct order`() = runBlocking{
+        val notes = getNotesUseCase(NoteOrder.Title(OrderType.Descending)).first()
+
+        for (i in 0..notes.size - 2){
+            assertThat(notes[i].title).isGreaterThan(notes[i+1].title)
+        }
+    }
+    @Test
+    fun `Order notes by date Ascending, correct order`() = runBlocking{
+        val notes = getNotesUseCase(NoteOrder.Date(OrderType.Ascending)).first()
+
+        for (i in 0..notes.size - 2){
+            assertThat(notes[i].timestamp).isLessThan(notes[i+1].timestamp)
+        }
+    }
+    @Test
+    fun `Order notes by date Descending, correct order`() = runBlocking{
+        val notes = getNotesUseCase(NoteOrder.Date(OrderType.Descending)).first()
+
+        for (i in 0..notes.size - 2){
+            assertThat(notes[i].timestamp).isGreaterThan(notes[i+1].timestamp)
+        }
+    }
+    @Test
+    fun `Order notes by color Ascending, correct order`() = runBlocking{
+        val notes = getNotesUseCase(NoteOrder.Color(OrderType.Ascending)).first()
+
+        for (i in 0..notes.size - 2){
+            assertThat(notes[i].color).isLessThan(notes[i+1].color)
+        }
+    }
+    @Test
+    fun `Order notes by color Descending, correct order`() = runBlocking{
+        val notes = getNotesUseCase(NoteOrder.Color(OrderType.Descending)).first()
+
+        for (i in 0..notes.size - 2){
+            assertThat(notes[i].color).isGreaterThan(notes[i+1].color)
+        }
+    }
+
 }
