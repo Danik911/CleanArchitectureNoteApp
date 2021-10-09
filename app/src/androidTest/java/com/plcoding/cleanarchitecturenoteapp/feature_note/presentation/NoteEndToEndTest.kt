@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.plcoding.cleanarchitecturenoteapp.core.util.TestTags.CONTEXT_TEXT_FIELD
+import com.plcoding.cleanarchitecturenoteapp.core.util.TestTags.NOTE_ITEM
 import com.plcoding.cleanarchitecturenoteapp.core.util.TestTags.TITLE_TEXT_FIELD
 import com.plcoding.cleanarchitecturenoteapp.di.AppModule
 import com.plcoding.cleanarchitecturenoteapp.feature_note.presentation.add_edit_note.AddEditNoteScreen
@@ -75,8 +76,9 @@ class NoteEndToEndTest {
             }
         }
     }
+
     @Test
-    fun saveNewNote_editAfterwards(){
+    fun saveNewNote_editAfterwards() {
         composeRule.onNodeWithContentDescription("Add note").performClick()
 
         composeRule
@@ -106,8 +108,45 @@ class NoteEndToEndTest {
         composeRule.onNodeWithText("test-title2").assertIsDisplayed()
 
 
+    }
 
+    @Test
+    fun saveNewNotes_orderByTitleDescending() {
+        for (i in 1..3) {
+            composeRule.onNodeWithContentDescription("Add note").performClick()
+
+            composeRule
+                .onNodeWithTag(TITLE_TEXT_FIELD)
+                .performTextInput(i.toString())
+            composeRule
+                .onNodeWithTag(CONTEXT_TEXT_FIELD)
+                .performTextInput(i.toString())
+            composeRule.onNodeWithContentDescription("Save note").performClick()
+        }
+
+        composeRule.onNodeWithText("1").assertIsDisplayed()
+        composeRule.onNodeWithText("2").assertIsDisplayed()
+        composeRule.onNodeWithText("3").assertIsDisplayed()
+
+
+        composeRule
+            .onNodeWithContentDescription("Sort")
+            .performClick()
+        composeRule
+            .onNodeWithContentDescription("Title")
+            .performClick()
+        composeRule
+            .onNodeWithContentDescription("Descending")
+            .performClick()
+
+        composeRule.onAllNodesWithTag(NOTE_ITEM)[0]
+            .assertTextContains("3")
+        composeRule.onAllNodesWithTag(NOTE_ITEM)[1]
+            .assertTextContains("2")
+        composeRule.onAllNodesWithTag(NOTE_ITEM)[2]
+            .assertTextContains("1")
 
 
     }
+
 }
